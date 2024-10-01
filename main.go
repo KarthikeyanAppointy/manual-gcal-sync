@@ -11,14 +11,18 @@ import (
 	"log"
 )
 
+var (
+	parent = locationId1
+)
+
 const (
-	Parent               = "g/c/l"
 	URL                  = ":"
 	PORT                 = "50051"
 	SkipRightHeaderKey   = "X-UaHsPdmE-Header"
 	SkipRightHeaderValue = "UhPdmFtUmFaGyZQ"
-	DBConnectionString   = "postgres://karthikeyan@appointy.com:@127.0.0.1:9092/mathapp2203?sslmode=disable"
-	parent               = "grp_01HA9WW1JPRN80YE0DS6ZJJN88/com_01HK7BZPNFQ3ZAND7R65VBNGW0/loc_01HSB4YH8DZZTNJ74AHHS2Q5HM"
+	DBConnectionString   = "postgres://karthikeyan@appointy.com:@127.0.0.1:9092/waqt2203?sslmode=disable"
+	locationId1          = "grp_01F1QGKK7M8ZY6D72JD7KC0K00/com_01H75WFN5GVGWT4ZXNZTN61DR3/loc_01H8D10BTB47466EQJAKB507C2"
+	locationId2          = "grp_01F1QGKK7M8ZY6D72JD7KC0K00/com_01H75WFN5GVGWT4ZXNZTN61DR3/loc_01H75WK22D58GNS9CSZYWYPSDH"
 )
 
 type Script struct {
@@ -29,7 +33,7 @@ type Script struct {
 
 func NewScript(db *sql.DB, appointmentsClient pb.AppointmentsClient) *Script {
 	return &Script{
-		Parent:             Parent,
+		Parent:             parent,
 		DB:                 db,
 		AppointmentsClient: appointmentsClient,
 	}
