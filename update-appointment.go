@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	helper "go.appointy.com/waqt/appointment/availability"
+	"fmt"
 	"go.appointy.com/waqt/appointment/pb"
+	"google.golang.org/genproto/protobuf/field_mask"
 	"strings"
 	"time"
 )
@@ -12,18 +13,20 @@ func (s *Script) UpdateAppointment(appointments []*AppointmentWithParentInfo) er
 
 	for _, appointment := range appointments {
 
-		_, err := s.AppointmentsClient.UpdateAppointment(context.Background(), &pb.UpdateAppointmentRequest{
+		updateAppointmentRequest := &pb.UpdateAppointmentRequest{
 			Appointment: &pb.Appointment{
-				Id:       appointment.AppointmentId,
+				Id:       fmt.Sprintf("%s/%s", parent, appointment.AppointmentId),
 				Service:  &pb.Service{Id: appointment.ServiceId},
 				TimeSlot: appointment.TimeSlot,
 				Quantity: int64(appointment.Quantity),
 				Status:   pb.AppointmentStatus(appointment.Status),
 			},
-			UpdateMask:       helper.FieldMask("service", "timeSlot", "quantity"),
+			UpdateMask:       &field_mask.FieldMask{Paths: []string{"service", "time_slot", "quantity"}},
 			SkipValidation:   true,
 			SendNotification: &pb.SendNotification{Email: false, Sms: false},
-		})
+		}
+
+		_, err := s.AppointmentsClient.UpdateAppointment(context.Background(), updateAppointmentRequest)
 		if err != nil {
 			if strings.Contains(err.Error(), "nothing to update") {
 				return err
@@ -38,21 +41,22 @@ func (s *Script) UpdateAppointment(appointments []*AppointmentWithParentInfo) er
 func (s *Script) UpdateRecurringAppointment(appointments []*AppointmentWithParentInfo) error {
 
 	for _, appointment := range appointments {
-		_, err := s.AppointmentsClient.UpdateRecurringAppointments(context.Background(), &pb.UpdateRecurringAppointmentsRequest{
-			Parent: appointment.Parent,
+		recurringAptReq := &pb.UpdateRecurringAppointmentsRequest{
+			Parent: parent,
 			Base: &pb.Appointment{
-				Id:       appointment.AppointmentId,
+				Id:       fmt.Sprintf("%s/%s", parent, appointment.AppointmentId),
 				Service:  &pb.Service{Id: appointment.ServiceId},
 				TimeSlot: appointment.TimeSlot,
 				Quantity: int64(appointment.Quantity),
 				Status:   pb.AppointmentStatus(appointment.Status),
 			},
-			UpdateMask:       helper.FieldMask("service", "timeSlot", "quantity"),
+			UpdateMask:       &field_mask.FieldMask{Paths: []string{"service", "time_slot", "quantity"}},
 			RecurringType:    pb.RecurringUpdateType_ThisAndFollowingAppointment,
 			RecurringId:      appointment.RecurringId,
 			SendNotification: &pb.SendNotification{Email: false, Sms: false},
 			SkipValidation:   true,
-		})
+		}
+		_, err := s.AppointmentsClient.UpdateRecurringAppointments(context.Background(), recurringAptReq)
 		if err != nil {
 			if strings.Contains(err.Error(), "nothing to update") {
 				return err

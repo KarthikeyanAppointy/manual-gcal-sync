@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"go.appointy.com/waqt/appointment/pb"
 	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
@@ -12,12 +13,12 @@ import (
 
 const (
 	Parent               = "g/c/l"
-	URL                  = ""
-	PORT                 = ""
-	SkipRightHeaderKey   = ""
-	SkipRightHeaderValue = ""
-	DBConnectionString   = ""
-	parent               = "grp_01HA9WW1JPRN80YE0DS6ZJJN88/com_01HK7BZPNFQ3ZAND7R65VBNGW0/loc_01HK7EDE81B8Y4EGQ2KQAMHHYB"
+	URL                  = ":"
+	PORT                 = "50051"
+	SkipRightHeaderKey   = "X-UaHsPdmE-Header"
+	SkipRightHeaderValue = "UhPdmFtUmFaGyZQ"
+	DBConnectionString   = "postgres://karthikeyan@appointy.com:@127.0.0.1:9092/mathapp2203?sslmode=disable"
+	parent               = "grp_01HA9WW1JPRN80YE0DS6ZJJN88/com_01HK7BZPNFQ3ZAND7R65VBNGW0/loc_01HSB4YH8DZZTNJ74AHHS2Q5HM"
 )
 
 type Script struct {
@@ -50,13 +51,12 @@ func initScript() (*Script, error) {
 	if err != nil {
 		log.Fatalf("failed to dial: %v", err)
 	}
-	defer conn.Close()
 
 	db, err := sql.Open("postgres", DBConnectionString)
 	if err != nil {
 		log.Fatalf("failed to open db: %v", err)
 	}
-	defer db.Close()
+
 	if err := db.Ping(); err != nil {
 		log.Fatalf("failed to ping db: %v", err)
 	}
@@ -71,24 +71,25 @@ func main() {
 		log.Fatalf("failed to initialize script: %v", err)
 	}
 
-	appointments := make([]*AppointmentWithParentInfo, 0, 250)
+	//appointments := make([]*AppointmentWithParentInfo, 0, 250)
 	recurringAppointments := make([]*AppointmentWithParentInfo, 0, 250)
 
 	hasNext := true
 
-	for hasNext {
-		appointment, hnxt, err := script.ListAppointment(parent, 250, len(appointments))
-		if err != nil {
-			log.Fatalf("failed to list appointments: %v", err)
-		}
-
-		err = script.UpdateAppointment(appointment)
-		if err != nil {
-			log.Fatalf("failed to update appointments on offset %s, err: %v", len(appointments), err)
-		}
-		appointments = append(appointments, appointment...)
-		hasNext = hnxt
-	}
+	//for hasNext {
+	//	appointment, hnxt, err := script.ListAppointment(parent, 250, len(appointments))
+	//	if err != nil {
+	//		log.Fatalf("failed to list appointments: %v", err)
+	//	}
+	//
+	//	err = script.UpdateAppointment(appointment)
+	//	if err != nil {
+	//		log.Fatalf("failed to update appointments on offset %s, err: %v", len(appointments), err)
+	//	}
+	//	appointments = append(appointments, appointment...)
+	//	fmt.Println("appointment offset: ", len(appointments), " completed")
+	//	hasNext = hnxt
+	//}
 
 	hasNext = true
 	for hasNext {
@@ -103,6 +104,7 @@ func main() {
 		}
 
 		recurringAppointments = append(recurringAppointments, appointment...)
+		fmt.Println("Recurring appointment offset: ", len(recurringAppointments), " completed")
 		hasNext = hnxt
 	}
 
