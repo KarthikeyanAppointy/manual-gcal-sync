@@ -71,41 +71,41 @@ func main() {
 		log.Fatalf("failed to initialize script: %v", err)
 	}
 
-	//appointments := make([]*AppointmentWithParentInfo, 0, 250)
-	recurringAppointments := make([]*AppointmentWithParentInfo, 0, 250)
+	appointments := make([]*AppointmentWithParentInfo, 0, 250)
+	//recurringAppointments := make([]*AppointmentWithParentInfo, 0, 250)
 
 	hasNext := true
 
-	//for hasNext {
-	//	appointment, hnxt, err := script.ListAppointment(parent, 250, len(appointments))
-	//	if err != nil {
-	//		log.Fatalf("failed to list appointments: %v", err)
-	//	}
-	//
-	//	err = script.UpdateAppointment(appointment)
-	//	if err != nil {
-	//		log.Fatalf("failed to update appointments on offset %s, err: %v", len(appointments), err)
-	//	}
-	//	appointments = append(appointments, appointment...)
-	//	fmt.Println("appointment offset: ", len(appointments), " completed")
-	//	hasNext = hnxt
-	//}
-
-	hasNext = true
 	for hasNext {
-		appointment, hnxt, err := script.ListRecurringAppointment(parent, 250, len(recurringAppointments))
+		appointment, hnxt, err := script.ListAppointment(parent, 250, len(appointments))
 		if err != nil {
-			log.Fatalf("failed to list recurring appointments: %v", err)
+			log.Fatalf("failed to list appointments: %v", err)
 		}
 
-		err = script.UpdateRecurringAppointment(appointment)
+		err = script.UpdateAppointment(appointment)
 		if err != nil {
-			log.Fatalf("failed to update recurring appointments on offset %s, err: %v", len(recurringAppointments), err)
+			log.Fatalf("failed to update appointments on offset %s, err: %v", len(appointments), err)
 		}
-
-		recurringAppointments = append(recurringAppointments, appointment...)
-		fmt.Println("Recurring appointment offset: ", len(recurringAppointments), " completed")
+		appointments = append(appointments, appointment...)
+		fmt.Println("appointment offset: ", len(appointments), " completed")
 		hasNext = hnxt
 	}
+
+	//hasNext = true
+	//for hasNext {
+	//	appointment, hnxt, err := script.ListRecurringAppointment(parent, 250, len(recurringAppointments))
+	//	if err != nil {
+	//		log.Fatalf("failed to list recurring appointments: %v", err)
+	//	}
+	//
+	//	err = script.UpdateRecurringAppointment(appointment)
+	//	if err != nil {
+	//		log.Fatalf("failed to update recurring appointments on offset %s, err: %v", len(recurringAppointments), err)
+	//	}
+	//
+	//	recurringAppointments = append(recurringAppointments, appointment...)
+	//	fmt.Println("Recurring appointment offset: ", len(recurringAppointments), " completed")
+	//	hasNext = hnxt
+	//}
 
 }

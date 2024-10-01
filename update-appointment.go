@@ -31,8 +31,8 @@ func (s *Script) UpdateAppointment(appointments []*AppointmentWithParentInfo) er
 			if strings.Contains(err.Error(), "nothing to update") {
 				return err
 			}
-			time.Sleep(2 * time.Second)
 		}
+		time.Sleep(2 * time.Second)
 	}
 
 	return nil
